@@ -3,286 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bubble World • Taro Milk Tea Pouring Live</title>
+  <title>Bubble World • Taro Milk Tea</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
     
-    body { 
-      font-family: 'Poppins', sans-serif; 
-      overflow-x: hidden;
-    }
-    
-    /* Full-screen Pouring Background */
+    body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+
     .pour-container {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 100%; height: 100vh;
       z-index: -1;
       overflow: hidden;
-      pointer-events: none;
+      background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.25)), 
+                  url('https://i.imgur.com/5ux4E.png') center/cover no-repeat; /* Your image */
+      background-attachment: fixed;
     }
 
-    /* Taro Milk Tea Glass – moved to BOTTOM LEFT */
     .glass {
       position: absolute;
-      bottom: 8%;
-      left: 8%;
-      width: 280px;
+      bottom: 10%;
+      left: 10%;
+      width: 260px;
       height: 520px;
-      background: linear-gradient(transparent, #f8e1e1);
-      border: 18px solid #fff;
-      border-radius: 50% 50% 40% 40%;
-      box-shadow: 0 0 60px rgba(0,0,0,0.3),
-                  inset 0 0 40px rgba(255,255,255,0.6);
+      border: 22px solid rgba(255,255,255,0.95);
+      border-radius: 50% 50% 38% 38%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.4),
+                  inset 0 0 40px rgba(255,255,255,0.7);
       overflow: hidden;
+      background: #f8e1e1;
     }
-    
-    /* Taro Milk Tea Liquid (purple-cream gradient) */
+
     .liquid {
       position: absolute;
-      bottom: 0;
-      left: 0;
+      bottom: 0; left: 0;
       width: 100%;
       height: 0%;
-      background: linear-gradient(to top, #9f5ed4, #d8a8f0);
-      transition: height 0.08s linear;
-      box-shadow: inset 0 15px 25px rgba(255,255,255,0.5),
-                  inset 0 -10px 15px rgba(0,0,0,0.2);
+      background: linear-gradient(to top, #9f5ed4, #c38be8, #e0b8f5);
+      transition: height 0.1s linear;
+      box-shadow: inset 0 20px 30px rgba(255,255,255,0.5);
     }
 
-    /* Pour Stream – starts at TOP RIGHT, pours diagonally to glass */
-    .pour-stream {
-      position: absolute;
-      top: 8%;
-      right: 8%;
-      width: 28px;
-      height: 0;
-      background: linear-gradient(180deg, transparent, #d8a8f0 30%, #9f5ed4);
-      border-radius: 50px;
-      box-shadow: 0 0 30px #9f5ed4,
-                  0 0 60px rgba(159, 94, 212, 0.6);
-      transform: rotate(-38deg);
-      opacity: 0;
-      transition: all 0.2s linear;
-      z-index: -1;
-    }
-    .pour-stream::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        180deg,
-        transparent,
-        transparent 10px,
-        rgba(255,255,255,0.7) 10px,
-        rgba(255,255,255,0.7) 20px
-      );
-      animation: flow 0.8s linear infinite;
-      opacity: 0.6;
-    }
-    @keyframes flow {
-      0% { background-position: 0 0; }
-      100% { background-position: 0 200px; }
-    }
-
-    /* Splash particles inside glass */
     .splash {
       position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 12px;
-      height: 12px;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.85);
       border-radius: 50%;
-      box-shadow: 0 0 12px #d8a8f0;
-      animation: splashAnim 1.2s ease-out forwards;
-      pointer-events: none;
-    }
-    @keyframes splashAnim {
-      0%   { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-120px) scale(0.3); opacity: 0; }
+      box-shadow: 0 0 15px #d8a8f0;
+      animation: splashAnim 1.4s ease-out forwards;
     }
 
-    /* Boba pearls inside liquid */
-    .boba {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      background: #3a2a1f;
-      border-radius: 50%;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    @keyframes splashAnim {
+      0% { transform: scale(0.6) translateY(0); opacity: 1; }
+      100% { transform: scale(0.2) translateY(-140px); opacity: 0; }
     }
   </style>
 </head>
-<body class="bg-gradient-to-b from-pink-50 to-purple-50 text-gray-800">
+<body class="bg-gradient-to-b from-pink-50 to-purple-50">
 
-  <!-- Pouring Background -->
-  <div class="pour-container">
-    <!-- Glass at bottom-left -->
+  <!-- Your Image + Pouring Background -->
+  <div class="pour-container" id="pourContainer">
     <div class="glass" id="glass">
       <div id="liquid" class="liquid"></div>
     </div>
-
-    <!-- Pour stream from top-right -->
-    <div class="pour-stream" id="pourStream"></div>
   </div>
 
   <!-- Navbar -->
-  <nav class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50">
+  <nav class="bg-white/95 backdrop-blur shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="text-4xl">🧋</div>
-        <h1 class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Bubble World</h1>
-      </div>
-      <div class="hidden md:flex gap-8 text-lg font-medium">
-        <a href="#menu" class="hover:text-pink-500 transition">Menu</a>
-        <a href="#locations" class="hover:text-pink-500 transition">6 Locations</a>
-        <a href="#" class="hover:text-pink-500 transition">Order Now</a>
+        <span class="text-4xl">🧋</span>
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Bubble World</h1>
       </div>
       <button onclick="alert('Online ordering coming soon!')" 
-              class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition">
-        Order Online
+              class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3.5 rounded-3xl font-semibold hover:scale-105 transition">
+        Order Taro Milk Tea
       </button>
     </div>
   </nav>
 
   <!-- Hero -->
   <section class="min-h-screen flex items-center justify-center text-center px-6 relative">
-    <div class="max-w-4xl mx-auto pt-20">
-      <div class="inline-flex items-center gap-3 bg-white/80 backdrop-blur px-6 py-2 rounded-3xl mb-8 text-lg font-medium shadow">
-        <span class="text-3xl">🧋</span>
-        LIVE: Taro Milk Tea Pouring
-      </div>
-      <h2 class="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-        Scroll to pour our<br>
-        <span class="bg-gradient-to-r from-[#9f5ed4] via-[#d8a8f0] to-pink-500 bg-clip-text text-transparent">Signature Taro Milk Tea</span>
+    <div class="max-w-3xl mx-auto pt-16">
+      <h2 class="text-6xl md:text-7xl font-bold leading-tight mb-6">
+        Scroll to Pour<br>
+        <span class="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Signature Taro Milk Tea</span>
       </h2>
-      <p class="text-2xl text-gray-600 mb-10">Watch it pour from the top right… fill the glass… with refreshing splashes!</p>
-      
-      <div class="flex gap-4 justify-center">
-        <a href="#menu" class="bg-white shadow-xl text-pink-600 px-10 py-5 rounded-3xl text-xl font-semibold hover:scale-105 transition">Full Menu</a>
-        <a href="#locations" class="border-2 border-white text-white px-10 py-5 rounded-3xl text-xl font-semibold hover:bg-white/10 transition">Our 6 Locations</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Menu Teaser -->
-  <section id="menu" class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-      <h2 class="text-5xl font-bold text-center mb-8">Featured: Taro Milk Tea</h2>
-      <p class="text-center text-xl max-w-md mx-auto">Creamy taro + fresh milk + chewy boba. $4.99 • Scroll more to see the glass fill completely with splashes!</p>
-      
-      <div class="mt-16 grid md:grid-cols-3 gap-8 text-center">
-        <div class="bg-gradient-to-br from-purple-100 to-pink-100 p-8 rounded-3xl">Taro Milk Tea</div>
-        <div class="bg-gradient-to-br from-purple-100 to-pink-100 p-8 rounded-3xl">Add tapioca +$0.50</div>
-        <div class="bg-gradient-to-br from-purple-100 to-pink-100 p-8 rounded-3xl">Bursting bubbles +$1.00</div>
-      </div>
+      <p class="text-xl text-white/90 drop-shadow-md">Watch the creamy taro milk tea pour and splash — just like the real thing!</p>
     </div>
   </section>
 
   <script>
     const liquid = document.getElementById('liquid');
-    const pourStream = document.getElementById('pourStream');
     const glass = document.getElementById('glass');
-    
-    let lastFill = 0;
-    let lastScroll = 0;
 
     function updatePour() {
       const scrollY = window.scrollY;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      let fillPercent = (scrollY / maxScroll) * 100;
+      let fill = Math.max(15, Math.min(98, (scrollY / maxScroll) * 100));
       
-      fillPercent = Math.max(12, Math.min(98, fillPercent));
-      liquid.style.height = fillPercent + '%';
+      liquid.style.height = fill + '%';
 
-      // Pour stream from top-right gets stronger as you scroll
-      const streamHeight = Math.min(620, fillPercent * 7);
-      pourStream.style.height = streamHeight + 'px';
-      pourStream.style.opacity = fillPercent > 10 ? '1' : '0';
-
-      // Create splash effects when liquid rises
-      if (fillPercent > lastFill + 8) {
+      // Create splash & boba when filling
+      if (fill > 30 && Math.random() > 0.6) {
         createSplash();
-        lastFill = fillPercent;
       }
-
-      // Occasional boba pearls inside glass
-      if (fillPercent > 35 && Math.random() > 0.7) {
-        createBobaPearl();
+      if (fill > 45 && Math.random() > 0.75) {
+        createBoba();
       }
     }
 
     function createSplash() {
-      const splashCount = 6 + Math.floor(Math.random() * 5);
-      for (let i = 0; i < splashCount; i++) {
-        const splash = document.createElement('div');
-        splash.className = 'splash';
-        
-        // Random horizontal position inside glass
-        const leftPos = 25 + Math.random() * 50;
-        splash.style.left = leftPos + '%';
-        
-        // Random size & delay
-        const size = 8 + Math.random() * 14;
-        splash.style.width = size + 'px';
-        splash.style.height = size + 'px';
-        splash.style.animationDelay = (Math.random() * 0.3) + 's';
-        
-        // Random purple tint
-        if (Math.random() > 0.6) splash.style.background = '#d8a8f0';
-        
-        glass.appendChild(splash);
-        
-        // Remove after animation
-        setTimeout(() => splash.remove(), 1600);
-      }
+      const splash = document.createElement('div');
+      splash.className = 'splash';
+      splash.style.width = (12 + Math.random() * 18) + 'px';
+      splash.style.height = splash.style.width;
+      splash.style.left = (35 + Math.random() * 30) + '%';
+      splash.style.bottom = (20 + Math.random() * 40) + '%';
+      glass.appendChild(splash);
+      setTimeout(() => splash.remove(), 1500);
     }
 
-    function createBobaPearl() {
+    function createBoba() {
       const boba = document.createElement('div');
-      boba.className = 'boba';
-      boba.style.left = (30 + Math.random() * 40) + '%';
-      boba.style.bottom = (10 + Math.random() * 70) + '%';
+      boba.style.position = 'absolute';
+      boba.style.width = '20px';
+      boba.style.height = '20px';
+      boba.style.background = '#2c1f17';
+      boba.style.borderRadius = '50%';
+      boba.style.left = (32 + Math.random() * 36) + '%';
+      boba.style.bottom = (15 + Math.random() * 55) + '%';
+      boba.style.boxShadow = '0 4px 8px rgba(0,0,0,0.5)';
       glass.appendChild(boba);
       
-      // Gentle float animation
       setTimeout(() => {
-        boba.style.transition = 'all 4s ease-in-out';
-        boba.style.transform = `translateY(-${30 + Math.random()*40}px)`;
-      }, 100);
+        boba.style.transition = 'transform 3s';
+        boba.style.transform = 'translateY(-60px)';
+      }, 50);
       
-      setTimeout(() => boba.remove(), 5000);
+      setTimeout(() => boba.remove(), 4000);
     }
 
-    // Trigger drops every time user scrolls a bit
-    window.addEventListener('scroll', () => {
-      updatePour();
-      
-      const currentScroll = window.scrollY;
-      if (currentScroll > lastScroll + 80) {
-        // Extra visual pour boost
-        pourStream.style.height = Math.min(680, parseFloat(pourStream.style.height || 0) + 80) + 'px';
-        lastScroll = currentScroll;
-      }
-    });
-
-    // Initial load
+    window.addEventListener('scroll', updatePour);
     window.addEventListener('load', () => {
       updatePour();
-      // Start with a tiny splash for demo
-      setTimeout(() => createSplash(), 800);
+      setTimeout(createSplash, 600); // Demo splash
     });
-
-    // Responsive canvas-like feel (optional resize)
-    window.addEventListener('resize', updatePour);
   </script>
 </body>
 </html>
