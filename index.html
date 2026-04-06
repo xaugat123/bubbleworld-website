@@ -10,27 +10,34 @@
     
     body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
-    .pour-container {
+    /* Multi-Layer Parallax */
+    .layer {
       position: fixed;
       top: 0; left: 0;
-      width: 100%; height: 100vh;
-      z-index: -1;
-      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)), 
-                  url('taro-splash.png') center/cover no-repeat;
-      background-attachment: fixed;
+      width: 100%; height: 120vh;
+      background-size: cover;
+      background-position: center;
+      z-index: -3;
+      transition: transform 0.15s ease-out;
     }
+
+    .layer1 { background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('taro-pour.png'); z-index: -3; } /* Empty + pouring */
+    .layer2 { background-image: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), url('taro-half.png'); z-index: -2; } /* Half filled */
+    .layer3 { background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)), url('taro-full.png'); z-index: -1; } /* Full with splash */
 
     .glass {
       position: absolute;
-      bottom: 12%;
-      left: 8%;
-      width: 260px;
-      height: 520px;
-      border: 22px solid rgba(255,255,255,0.95);
-      border-radius: 50% 50% 38% 38%;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.45),
-                  inset 0 0 50px rgba(255,255,255,0.7);
+      bottom: 10%;
+      left: 10%;
+      width: 280px;
+      height: 560px;
+      border: 20px solid rgba(255,255,255,0.95);
+      border-radius: 50% 50% 40% 40%;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.5),
+                  inset 0 0 60px rgba(255,255,255,0.8);
       overflow: hidden;
+      background: #f8e1e1;
+      z-index: 10;
     }
 
     .liquid {
@@ -43,39 +50,70 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-b from-pink-50 to-purple-50">
+<body class="bg-black">
 
-  <div class="pour-container">
+  <!-- Parallax Layers -->
+  <div class="layer layer1" id="layer1"></div>
+  <div class="layer layer2" id="layer2"></div>
+  <div class="layer layer3" id="layer3"></div>
+
+  <!-- Glass Overlay -->
+  <div class="pour-container relative z-10">
     <div class="glass" id="glass">
       <div id="liquid" class="liquid"></div>
     </div>
   </div>
 
-  <!-- Navbar + Hero same as before -->
-  <nav class="bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50">
+  <!-- Navbar -->
+  <nav class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <span class="text-4xl">🧋</span>
         <h1 class="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Bubble World</h1>
       </div>
-      <button onclick="alert('Coming soon!')" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3.5 rounded-3xl font-semibold">
-        Order Taro Milk Tea
+      <button onclick="alert('Online ordering coming soon!')" 
+              class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3.5 rounded-3xl font-semibold hover:scale-105 transition">
+        Order Now
       </button>
     </div>
   </nav>
 
-  <section class="min-h-screen flex items-center justify-center text-center px-6">
-    <div class="max-w-3xl">
-      <h2 class="text-6xl md:text-7xl font-bold text-white drop-shadow-2xl">Scroll to Pour<br>Signature Taro Milk Tea</h2>
+  <!-- Hero -->
+  <section class="min-h-screen flex items-center justify-center text-center px-6 relative z-20">
+    <div class="max-w-4xl mx-auto pt-20">
+      <h2 class="text-6xl md:text-7xl font-bold leading-tight text-white drop-shadow-2xl">
+        Scroll to Pour<br>
+        <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Signature Taro Milk Tea</span>
+      </h2>
+      <p class="mt-6 text-xl text-white/90">Watch the layers come alive with smooth parallax</p>
     </div>
   </section>
 
   <script>
+    const layer1 = document.getElementById('layer1');
+    const layer2 = document.getElementById('layer2');
+    const layer3 = document.getElementById('layer3');
     const liquid = document.getElementById('liquid');
+
     window.addEventListener('scroll', () => {
       const scrollY = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      liquid.style.height = Math.min(98, Math.max(15, (scrollY / max) * 100)) + '%';
+
+      // Different parallax speeds for depth
+      layer1.style.transform = `translateY(${scrollY * 0.2}px)`;
+      layer2.style.transform = `translateY(${scrollY * 0.5}px)`;
+      layer3.style.transform = `translateY(${scrollY * 0.8}px)`;
+
+      // Liquid filling
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      let fill = Math.max(12, Math.min(98, (scrollY / maxScroll) * 100));
+      liquid.style.height = fill + '%';
+    });
+
+    // Initial demo splash
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        liquid.style.height = '35%';
+      }, 600);
     });
   </script>
 </body>
